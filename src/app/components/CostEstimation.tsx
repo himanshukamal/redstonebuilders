@@ -5,7 +5,7 @@ const CostEstimation = () => {
   const constructionTypes = [
     {
       name: 'Basic',
-      price: 1820,
+      price: 1850,
       features: [
         'Standard quality cement & bricks',
         'Basic tiles & sanitaryware',
