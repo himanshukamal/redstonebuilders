@@ -5,7 +5,7 @@ import Image from 'next/image';
 const brandImages = [
   '/ACC_Limited_logo.png',
   '/Ambuja_logo.png',
-  '/Godrej_logo.png',
+  '/Godrej_Logo.png',
   '/images-2.png',
   '/images-3.svg',
   '/Tata_Logo.png',
