@@ -2,13 +2,20 @@
 import React, { useState } from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import ReactFlagsSelect from "react-flags-select";
-import emailjs from "@emailjs/browser";
 
-const SERVICE_ID = "service_dihmqid";
-const TEMPLATE_ID = "template_0u69mad";
-const PUBLIC_KEY = "KVxxC6ss5pEiXJDCZ";
+type ContactFormProps = {
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  enquiryType?: string;
+};
 
-const ContactForm = () => {
+const ContactForm = ({
+  title = "Book Your Consultation",
+  subtitle = "For Best Quality Construction At Affordable Rates",
+  buttonText = "Start Your Construction",
+  enquiryType,
+}: ContactFormProps) => {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("IN");
@@ -22,6 +29,7 @@ const ContactForm = () => {
 
   const [isSending, setIsSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
+  const [sendError, setSendError] = useState("");
 
   const validate = () => {
     let valid = true;
@@ -53,21 +61,25 @@ const ContactForm = () => {
     if (!validate()) return;
 
     setIsSending(true);
-
-    const templateParams = {
-      from_name: name,
-      phone: `${selectedCountry} ${number}`,
-      message: message,
-    };
+    setSendError("");
 
     try {
-      const result = await emailjs.send(
-        SERVICE_ID,
-        TEMPLATE_ID,
-        templateParams,
-        PUBLIC_KEY
-      );
-      console.log("Email successfully sent!", result);
+      // Sent via our own API route so the Brevo API key stays on the server
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name,
+          phone: `${selectedCountry} ${number}`,
+          message,
+          enquiryType,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || "Could not send your message. Please try again.");
+      }
 
       setSentSuccess(true);
       setName("");
@@ -76,6 +88,9 @@ const ContactForm = () => {
       setErrors({ name: "", number: "", message: "" });
     } catch (error) {
       console.error("Email sending failed:", error);
+      setSendError(
+        error instanceof Error ? error.message : "Could not send your message. Please try again."
+      );
     } finally {
       setIsSending(false);
       setTimeout(() => setSentSuccess(false), 3000); // reset success message after 3 sec
@@ -83,12 +98,15 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-4 w-full lg:max-w-[400px] h-fit flex flex-col gap-2">
+    <div
+      id="enquiry"
+      className="rounded-2xl bg-white p-4 w-full lg:max-w-[400px] h-fit flex flex-col gap-2 scroll-mt-[110px]"
+    >
       <p className="text-[24px] font-extrabold text-black text-center">
-        Book Your Consultation
+        {title}
       </p>
       <p className="text-black font-semibold text-center">
-        For Best Quality Construction At Affordable Rates
+        {subtitle}
       </p>
 
       <input
@@ -151,7 +169,7 @@ const ContactForm = () => {
             onClick={handleSubmit}
             className="w-full h-[64px] bg-[#E76969] flex items-center justify-center rounded-md text-white font-bold transition hover:bg-[#e76969fc] cursor-pointer"
           >
-            {isSending ? "Sending..." : "Start Your Construction"}
+            {isSending ? "Sending..." : buttonText}
           </button>
         </HoverCard.Trigger>
         <HoverCard.Content
@@ -165,6 +183,9 @@ const ContactForm = () => {
         <p className="text-green-600 font-semibold text-center mt-2">
           Message sent successfully!
         </p>
+      )}
+      {sendError && (
+        <p className="text-red-500 font-semibold text-center mt-2">{sendError}</p>
       )}
     </div>
   );

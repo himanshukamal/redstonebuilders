@@ -1,15 +1,13 @@
-// import BrandImageCarousel from "./components/BrandImageCarousel";
 import BrandImageCarousel from "./components/BrandImageCarousel";
 import CostEstimation from "./components/CostEstimation";
-import Header from "./components/Header";
 import HeroSection from "./components/heroSection";
+import ServicesOverview from "./components/ServicesOverview";
 
 export default function Home() {
   return (
-    //Restructuring
     <div className="">
-      <Header />
       <HeroSection />
+      <ServicesOverview />
       <BrandImageCarousel />
       <CostEstimation />
     </div>
