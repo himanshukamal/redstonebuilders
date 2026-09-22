@@ -8,7 +8,7 @@ export default function Home() {
   return (
     //Restructuring
     <div className="">
-      <Header />     
+      <Header />
       <HeroSection />
       <BrandImageCarousel />
       <CostEstimation />
