@@ -6,6 +6,7 @@ import HeroSection from "./components/heroSection";
 
 export default function Home() {
   return (
+    //Restructuring
     <div className="">
       <Header />     
       <HeroSection />
